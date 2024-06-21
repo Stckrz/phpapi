@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  apache:
+    image: php:apache
+    ports: 
+      - "8080:80"
+    volumes:
+      - ./php:/var/www/html
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment: 
+      MYSQL_ROOT_PASSWORD: passbird
+      MYSQL_DATABASE: stckrql
+      MYSQL_USER: stckrz
+      MYSQL_PASSWORD: stckrz123
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8181:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: passbird
