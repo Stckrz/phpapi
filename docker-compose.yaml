@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   apache:
-    image: php:apache
+    build: .
+    # image: php:apache
     ports: 
       - "8080:80"
     volumes:
