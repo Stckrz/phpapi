@@ -68,13 +68,13 @@ function handlePostUser($mysqli)
 {
 	$username = $_POST['username'];
 	$age = $_POST['age'];
-	$stmt = $mysqli->prepare('INSERT INTO users (username, age) VALUES (?, ?)');
-	$stmt->bind_param("ss", $username, $age);
+	$result = $mysqli->prepare('INSERT INTO users (username, age) VALUES (?, ?)');
+	$result->bind_param("ss", $username, $age);
 
-	if ($stmt->execute()) {
+	if ($result->execute()) {
 		echo "New record created for " . $username;
 	} else {
-		echo "Error: " . $stmt->error;
+		echo "Error: " . $result->error;
 	}
 }
 
