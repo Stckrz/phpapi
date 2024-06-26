@@ -6,9 +6,6 @@ header("Access-Control-Allow-Methods: *");
 header("Access-Control-Allow-Headers: *");
 
 $method = $_SERVER['REQUEST_METHOD'];
-$requesturi = explode('?', $_SERVER['REQUEST_URI']);
-// $input = json_decode(file_get_contents('php://input', true));
-// echo $input;
 
 $mysqli = new mysqli($host, $user, $password, $database);
 if ($mysqli->connect_error) {
@@ -33,63 +30,38 @@ switch ($method) {
 		break;
 }
 
+
 function handleGetShopItems($mysqli)
 {
+	header('Content-Type: application/json');
+	$response = [];
 	if (isset($_GET['shopItemId'])) {
 		$shopItemId = $mysqli->real_escape_string($_GET['shopItemId']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemId = '$shopItemId'");
-		$response = [];
-		if ($result->num_rows > 0) {
-			while ($row = $result->fetch_assoc()) {
-				$response[] = $row;
-			}
-		} else {
-			$response = ["message" => "0 results"];
-		}
 	} elseif (isset($_GET['shopItemName'])) {
 		$shopItemName = $mysqli->real_escape_string($_GET['shopItemName']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemName = '$shopItemName'");
-		$response = [];
-		if ($result->num_rows > 0) {
-			while ($row = $result->fetch_assoc()) {
-				$response[] = $row;
-			}
-		} else {
-			$response = ["message" => "0 results"];
-		}
 	} elseif (isset($_GET['page'])) {
-		$page = $mysqli->real_escape_string($_GET['page']);
-		$result = $mysqli->query('SELECT * FROM shopItems LIMIT 10 OFFSET ' . (($page - 1) * 10));
-		$response = [];
-		if ($result->num_rows > 0) {
-			while ($row = $result->fetch_assoc()) {
-				$response[] = $row;
-			}
-		} else {
-			$response = ["message" => "failed to fetch shopItems"];
-		}
+		$page = (int)$_GET['page'];
+		$offset = ($page - 1) * 10;
+		$result = $mysqli->query("SELECT * FROM shopItems LIMIT 10 OFFSET $offset");
 	} elseif (isset($_GET['parReport'])) {
-		$shopItemName = $mysqli->real_escape_string($_GET['parReport']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE quantity < paramount");
-		$response = [];
-		if ($result->num_rows > 0) {
-			while ($row = $result->fetch_assoc()) {
-				$response[] = $row;
-			}
-		} else {
-			$response = ["message" => "0 results"];
-		}
 	} else {
 		$result = $mysqli->query('SELECT * FROM shopItems');
-		$response = [];
-		if ($result->num_rows > 0) {
+	}
+	if($result){
+		if ($result->num_rows > 0){
 			while ($row = $result->fetch_assoc()) {
 				$response[] = $row;
 			}
-		} else {
-			$response = ["message" => "failed to fetch shopItems"];
-			echo json_encode($result);
-		}
+		} else{
+			$response = ["message" => "0 results"];
+			http_response_code(404);
+		}	
+	} else {
+		$response = ["message" => "Failed to fetch shopItems"];
+		http_response_code(500);
 	}
 	echo json_encode($response);
 }
@@ -101,12 +73,21 @@ function handlePostShopItem($mysqli)
 	$buyPrice = $_POST['buyPrice'];
 	$quantity = $_POST['quantity'];
 	$parAmount = $_POST['parAmount'];
+	
+	if (!is_string($shopItemName) || !is_numeric($price) || !is_numeric($buyPrice) || !is_int((int)$quantity) || !is_int((int)$parAmount)){
+		echo json_encode(["error" => "Error: " . "Invalid input data"]);
+		http_response_code(400);
+		return;
+	}
+
 	$result = $mysqli->prepare('INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?)');
-	$result->bind_param("sidii", $shopItemName, $price,$buyPrice, $quantity, $parAmount);
+	$result->bind_param("sddii", $shopItemName, $price,$buyPrice, $quantity, $parAmount);
+
 	if ($result->execute()) {
 		echo "New record created for " . $shopItemName;
 	} else {
-		echo "Error: " . $result->error;
+		echo json_encode(["error" => "Error: " . $result->error]);
+		http_response_code(500);
 	}
 }
 
@@ -150,6 +131,7 @@ function handlePutShopItem($mysqli)
 			}
 		} else {
 			echo json_encode(["message" => "error updating: improper json format"]);
+			http_response_code(500);
 		}
 	}
 }
@@ -165,7 +147,9 @@ function handleDeleteShopItem($mysqli)
 		if ($result->num_rows > 0) {
 			$response = ["message" => "Item deleted successfully"];
 		} else {
-			$response = ["message" => "database error"];
+		echo json_encode(["error" => "Error: " . $result->error]);
+		http_response_code(500);
+		return;
 		}
 	}
 
