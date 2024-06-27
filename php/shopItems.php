@@ -50,15 +50,15 @@ function handleGetShopItems($mysqli)
 	} else {
 		$result = $mysqli->query('SELECT * FROM shopItems');
 	}
-	if($result){
-		if ($result->num_rows > 0){
+	if ($result) {
+		if ($result->num_rows > 0) {
 			while ($row = $result->fetch_assoc()) {
 				$response[] = $row;
 			}
-		} else{
+		} else {
 			$response = ["message" => "0 results"];
 			http_response_code(404);
-		}	
+		}
 	} else {
 		$response = ["message" => "Failed to fetch shopItems"];
 		http_response_code(500);
@@ -73,15 +73,14 @@ function handlePostShopItem($mysqli)
 	$buyPrice = $_POST['buyPrice'];
 	$quantity = $_POST['quantity'];
 	$parAmount = $_POST['parAmount'];
-	
-	if (!is_string($shopItemName) || !is_numeric($price) || !is_numeric($buyPrice) || !is_int((int)$quantity) || !is_int((int)$parAmount)){
+
+	if (!is_string($shopItemName) || !is_numeric($price) || !is_numeric($buyPrice) || !is_int((int)$quantity) || !is_int((int)$parAmount)) {
 		echo json_encode(["error" => "Error: " . "Invalid input data"]);
 		http_response_code(400);
 		return;
 	}
-
-	$result = $mysqli->prepare('INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?)');
-	$result->bind_param("sddii", $shopItemName, $price,$buyPrice, $quantity, $parAmount);
+	$result = $mysqli->prepare("INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?)");
+	$result->bind_param("sddii", $shopItemName, $price, $buyPrice, $quantity, $parAmount);
 
 	if ($result->execute()) {
 		echo "New record created for " . $shopItemName;
@@ -147,9 +146,9 @@ function handleDeleteShopItem($mysqli)
 		if ($result->num_rows > 0) {
 			$response = ["message" => "Item deleted successfully"];
 		} else {
-		echo json_encode(["error" => "Error: " . $result->error]);
-		http_response_code(500);
-		return;
+			echo json_encode(["error" => "Error: " . $result->error]);
+			http_response_code(500);
+			return;
 		}
 	}
 
