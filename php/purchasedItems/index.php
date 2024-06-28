@@ -30,7 +30,15 @@ function handleGetPurchasedItems($mysqli)
 	//gets all purchasedItems where a certain shopItemId is included
 	if (isset($_GET['bulkPurchaseId'])) {
 		$bulkPurchaseId = $mysqli->real_escape_string($_GET['bulkPurchaseId']);
-		$result = $mysqli->query("SELECT * FROM purchasedItems WHERE bulkPurchaseId = $bulkPurchaseId");
+		$result = $mysqli->query("
+			SELECT 
+				shopItems.shopItemId AS 'Item Id', 
+				shopItems.shopItemName AS 'Item Name', 
+				purchasedItems.shopItemQuantity AS 'Purchased Quantity' 
+			FROM shopItems 
+			JOIN purchasedItems ON shopItems.shopItemId = purchasedItems.shopItemId 
+			WHERE purchasedItems.bulkPurchaseId = $bulkPurchaseId
+		");
 	} else {
 		$result = $mysqli->query("SELECT * FROM purchasedItems");
 	}
@@ -41,7 +49,6 @@ function handleGetPurchasedItems($mysqli)
 			}
 		} else {
 			$response = (["message" => "0 results"]);
-			http_response_code(400);
 		}
 	} else {
 		$response = (["message" => "Failed to fetch purchasedItemss"]);

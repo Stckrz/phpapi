@@ -30,7 +30,7 @@ function handleGetBulkPurchase($mysqli)
 
 	if (isset($_GET['bulkPurchaseId'])) {
 		$bulkPurchaseId = $mysqli->real_escape_string($_GET['bulkPurchaseId']);
-		$result = $mysqli->query("SELECT * FROM bulkPurchase WHERE bulkPurchaseId === $bulkPurchaseId");
+		$result = $mysqli->query("SELECT * FROM bulkPurchase WHERE bulkPurchaseId = '$bulkPurchaseId'");
 	} else {
 		$result = $mysqli->query("SELECT * FROM bulkPurchase");
 	}

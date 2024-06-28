@@ -16,6 +16,7 @@ CREATE TABLE bulkPurchase(
 CREATE TABLE purchasedItems (
 	shopItemId INT,
 	bulkPurchaseId INT,
+	shopItemQuantity INT,
 	PRIMARY KEY (shopItemId, bulkPurchaseId),
 	FOREIGN KEY (shopItemId) REFERENCES shopItems(shopItemId),
 	FOREIGN KEY (bulkPurchaseId) REFERENCES bulkPurchase(bulkPurchaseId),
