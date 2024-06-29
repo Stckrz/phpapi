@@ -46,7 +46,16 @@ function handleGetShopItems($mysqli)
 		$offset = ($page - 1) * 10;
 		$result = $mysqli->query("SELECT * FROM shopItems LIMIT 10 OFFSET $offset");
 	} elseif (isset($_GET['parReport'])) {
-		$result = $mysqli->query("SELECT * FROM shopItems WHERE quantity < paramount");
+		$result = $mysqli->query("
+		SELECT 
+			shopItemId AS 'Item Id',
+			shopItemName AS 'Item Name',
+			buyPrice AS 'Cost Per Unit',
+			quantity AS 'Quantity',
+			parAmount AS 'Par Amount'
+		FROM shopItems 
+		WHERE quantity < paramount
+	");
 	} else {
 		$result = $mysqli->query('SELECT * FROM shopItems');
 	}
