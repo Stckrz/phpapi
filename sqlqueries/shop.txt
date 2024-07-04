@@ -8,7 +8,7 @@ CREATE TABLE shopItems (
 );
 
 CREATE TABLE bulkPurchase(
-	bulkPurchaseId int AUTO_INCREMENT PRIMAY KEY,
+	bulkPurchaseId int AUTO_INCREMENT PRIMARY KEY,
 	totalPurchaseAmount FLOAT,
 	purchaseDate DATE
 );
@@ -19,10 +19,23 @@ CREATE TABLE purchasedItems (
 	shopItemQuantity INT,
 	PRIMARY KEY (shopItemId, bulkPurchaseId),
 	FOREIGN KEY (shopItemId) REFERENCES shopItems(shopItemId),
-	FOREIGN KEY (bulkPurchaseId) REFERENCES bulkPurchase(bulkPurchaseId),
+	FOREIGN KEY (bulkPurchaseId) REFERENCES bulkPurchase(bulkPurchaseId)
 );
 
+CREATE TABLE receivedOrder(
+	receivedOrderId int AUTO_INCREMENT PRIMARY KEY,
+	totalOrderAmount FLOAT,
+	orderDate DATE
+);
 
+CREATE TABLE purchasedItems (
+	shopItemId INT,
+	receivedOrderId INT,
+	shopItemQuantity INT,
+	PRIMARY KEY (shopItemId, receivedOrderId),
+	FOREIGN KEY (shopItemId) REFERENCES shopItems(shopItemId),
+	FOREIGN KEY (receivedOrderId) REFERENCES receivedOrder(receivedOrderId)
+);
 
 //This query will get the shopItemId and shopItem Name of every item that is in bulkPurchaseId of 1.
 SELECT shopItems.shopItemId, shopItems.shopItemName

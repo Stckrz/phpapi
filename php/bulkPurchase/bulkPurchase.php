@@ -31,6 +31,11 @@ function handleGetBulkPurchase($mysqli)
 	if (isset($_GET['bulkPurchaseId'])) {
 		$bulkPurchaseId = $mysqli->real_escape_string($_GET['bulkPurchaseId']);
 		$result = $mysqli->query("SELECT * FROM bulkPurchase WHERE bulkPurchaseId = '$bulkPurchaseId'");
+	} else if(isset($_GET['page'])){
+		$page = (int)$_GET['page'];
+		$offset = ($page - 1) * 10;
+		$result = $mysqli->query("SELECT * FROM bulkPurchase LIMIT 10 OFFSET $offset");
+
 	} else {
 		$result = $mysqli->query("SELECT * FROM bulkPurchase");
 	}
