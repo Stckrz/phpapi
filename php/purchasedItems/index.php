@@ -57,6 +57,7 @@ function handleGetPurchasedItems($mysqli)
 	echo json_encode($response);
 }
 
+//post takes formData
 function handlePostPurchasedItems($mysqli)
 {
 	$shopItemId = $_POST['shopItemId'];

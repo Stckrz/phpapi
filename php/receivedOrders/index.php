@@ -18,6 +18,9 @@ switch ($method) {
 	case "POST":
 		handlePostReceivedOrder($mysqli);
 		break;
+	case "PUT":
+		handlePutReceivedOrder($mysqli);
+		break;
 }
 
 function handleGetReceivedOrders($mysqli)
@@ -25,11 +28,11 @@ function handleGetReceivedOrders($mysqli)
 	$result = [];
 	if (isset($_GET['receivedOrderId'])) {
 		$receivedOrderId = $mysqli->real_escape_string($_GET['receivedOrderId']);
-		$result = $mysqli->query("SELECT * FROM receivedOrders WHERE receivedOrderId = $receivedOrderId");
+		$result = $mysqli->query("SELECT * FROM receivedOrder WHERE receivedOrderId = $receivedOrderId");
 	} else if (isset($_GET['page'])) {
 		$page = (int)$_GET['page'];
 		$offset = ($page - 1) * 10;
-		$result = $mysqli->query("SELECT * FROM receivedOrders LIMIT 10 OFFSET $offset");
+		$result = $mysqli->query("SELECT * FROM receivedOrder LIMIT 10 OFFSET $offset");
 	}
 	if ($result) {
 		if ($result->num_rows > 0) {
@@ -52,10 +55,9 @@ function handlePostReceivedOrder($mysqli)
 
 	if (!is_numeric($totalOrderAmount) | !is_string($orderDate)) {
 		json_encode(['message' => 'error: invalid json data']);
-		http_response_code(400);
 		return;
 	}
-	$result = $mysqli->prepare("INSERT INTO receivedOrders (totalOrderAmount, orderDate) VALUES (?, ?)");
+	$result = $mysqli->prepare("INSERT INTO receivedOrder (totalOrderAmount, orderDate) VALUES (?, ?)");
 	$result->bind_param('ds', $totalOrderAmount, $orderDate);
 
 	if ($result->execute()) {
@@ -63,6 +65,42 @@ function handlePostReceivedOrder($mysqli)
 		echo json_encode(["message" => "new receivedOrder created", "receivedOrderId" => $receivedOrderId]);
 	} else {
 		echo json_encode(["error" => "Error: " . $result->error]);
-		http_response_code(500);
+	}
+}
+
+function handlePutReceivedOrder($mysqli)
+{
+	parse_str($_SERVER['QUERY_STRING'], $queries);
+	$receivedOrderId = $queries['receivedOrderId'];
+	if (isset($receivedOrderId)) {
+		$requestBody = file_get_contents('php://input');
+		$data = json_decode($requestBody, true);
+		$fields = [];
+
+		if (isset($data['totalOrderAmount'])) {
+			$totalOrderAmount = floatVal($data['totalOrderAmount']);
+			$fields[] = "totalOrderAmount = '$totalOrderAmount'";
+		}
+		if (isset($data['orderDate'])) {
+			$orderDate = $mysqli->real_escape_string($data['orderDate']);
+			$fields[] = "orderDate = '$orderDate'";
+		}
+		if (isset($data['fulfilledDate'])) {
+			$fulfilledDate = $mysqli->real_escape_string($data['fulfilledDate']);
+			$fields[] = "fulfilledDate = '$fulfilledDate'";
+		}
+
+		if (count($fields) === 3) {
+			$query = "UPDATE receivedOrder SET " . implode(', ', $fields) . " WHERE receivedOrderId = $receivedOrderId";
+			echo $query;
+			if ($mysqli->query($query)) {
+				echo json_encode(["message" => "item updated successfully"]);
+			} else {
+				echo json_encode(["message" => "error updating: " . $mysqli->error]);
+			}
+		} else {
+			echo json_encode(["message" => "error updating: improper json format"]);
+			http_response_code(500);
+		}
 	}
 }
