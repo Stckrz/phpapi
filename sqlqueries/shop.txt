@@ -25,10 +25,11 @@ CREATE TABLE purchasedItems (
 CREATE TABLE receivedOrder(
 	receivedOrderId int AUTO_INCREMENT PRIMARY KEY,
 	totalOrderAmount FLOAT,
-	orderDate DATE
+	orderDate DATE,
+	fulfilledDate DATE
 );
 
-CREATE TABLE purchasedItems (
+CREATE TABLE orderedItems (
 	shopItemId INT,
 	receivedOrderId INT,
 	shopItemQuantity INT,
