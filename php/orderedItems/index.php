@@ -39,6 +39,18 @@ function handleGetOrderedItems($mysqli)
 			JOIN orderedItems ON shopItems.shopItemId = orderedItems.shopItemId 
 			WHERE orderedItems.orderedItemId = $orderedItemId
 		");
+	} else if (isset($_GET['receivedOrderId'])) {
+		//get all of the items in a specific receivedOrder
+		$receivedOrderId = $mysqli->real_escape_string($_GET['receivedOrderId']);
+		$result = $mysqli->query("
+			SELECT 
+				shopItems.shopItemId AS 'Item Id', 
+				shopItems.shopItemName AS 'Item Name', 
+				orderedItems.shopItemQuantity AS 'Purchased Quantity' 
+			FROM shopItems 
+			JOIN orderedItems ON shopItems.shopItemId = orderedItems.shopItemId 
+			WHERE orderedItems.receivedOrderId = $receivedOrderId
+		");
 	} else {
 		$result = $mysqli->query("SELECT * FROM orderedItems");
 	}
@@ -79,5 +91,3 @@ function handlePostOrderedItem($mysqli)
 		http_response_code(500);
 	}
 }
-
-?>

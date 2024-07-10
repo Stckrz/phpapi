@@ -33,6 +33,8 @@ function handleGetReceivedOrders($mysqli)
 		$page = (int)$_GET['page'];
 		$offset = ($page - 1) * 10;
 		$result = $mysqli->query("SELECT * FROM receivedOrder LIMIT 10 OFFSET $offset");
+	} else if (isset($_GET['unfulfilled'])){
+		$result = $mysqli->query("SELECT * FROM receivedOrder WHERE fulfilledDate IS NULL");
 	}
 	if ($result) {
 		if ($result->num_rows > 0) {
