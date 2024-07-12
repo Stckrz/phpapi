@@ -84,7 +84,7 @@ function handlePostShopItem($mysqli)
 		http_response_code(400);
 		return;
 	}
-	$result = $mysqli->prepare("INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?, ?)");
+	$result = $mysqli->prepare("INSERT INTO shopItems (shopItemName, shopItemCategory, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?, ?)");
 	$result->bind_param("ssddii", $shopItemName, $shopItemCategory, $price, $buyPrice, $quantity, $parAmount);
 
 	if ($result->execute()) {
