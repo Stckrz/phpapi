@@ -97,6 +97,7 @@ function handlePutReceivedOrder($mysqli)
 			echo $query;
 			if ($mysqli->query($query)) {
 				echo json_encode(["message" => "item updated successfully"]);
+				http_response_code(200);
 			} else {
 				echo json_encode(["message" => "error updating: " . $mysqli->error]);
 			}

@@ -1,6 +1,7 @@
 CREATE TABLE shopItems (
 	shopItemId int AUTO_INCREMENT PRIMARY KEY,
 	shopItemName VARCHAR(100),
+	shopItemCategory VARCHAR(100),
 	price FLOAT,
 	buyPrice FLOAT,
 	quantity INT(11),,
@@ -32,7 +33,7 @@ CREATE TABLE receivedOrder(
 CREATE TABLE orderedItems (
 	shopItemId INT,
 	receivedOrderId INT,
-	shopItemQuantity INT,
+	orderedQuantity INT,
 	PRIMARY KEY (shopItemId, receivedOrderId),
 	FOREIGN KEY (shopItemId) REFERENCES shopItems(shopItemId),
 	FOREIGN KEY (receivedOrderId) REFERENCES receivedOrder(receivedOrderId)

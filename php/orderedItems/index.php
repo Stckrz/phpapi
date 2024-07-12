@@ -32,9 +32,10 @@ function handleGetOrderedItems($mysqli)
 		$orderedItemId = $mysqli->real_escape_string($_GET['orderedItemId']);
 		$result = $mysqli->query("
 			SELECT 
-				shopItems.shopItemId AS 'Item Id', 
-				shopItems.shopItemName AS 'Item Name', 
-				orderedItems.shopItemQuantity AS 'Purchased Quantity' 
+				shopItems.shopItemId, 
+				shopItems.shopItemName, 
+				shopItems.quantity,
+				orderedItems.orderedQuantity 
 			FROM shopItems 
 			JOIN orderedItems ON shopItems.shopItemId = orderedItems.shopItemId 
 			WHERE orderedItems.orderedItemId = $orderedItemId
@@ -44,9 +45,10 @@ function handleGetOrderedItems($mysqli)
 		$receivedOrderId = $mysqli->real_escape_string($_GET['receivedOrderId']);
 		$result = $mysqli->query("
 			SELECT 
-				shopItems.shopItemId AS 'Item Id', 
-				shopItems.shopItemName AS 'Item Name', 
-				orderedItems.shopItemQuantity AS 'Purchased Quantity' 
+				shopItems.shopItemId, 
+				shopItems.shopItemName, 
+				shopItems.quantity, 
+				orderedItems.orderedQuantity 
 			FROM shopItems 
 			JOIN orderedItems ON shopItems.shopItemId = orderedItems.shopItemId 
 			WHERE orderedItems.receivedOrderId = $receivedOrderId
@@ -73,14 +75,14 @@ function handlePostOrderedItem($mysqli)
 {
 	$shopItemId = $_POST['shopItemId'];
 	$receivedOrderId = $_POST['receivedOrderId'];
-	$orderedItemQuantity = $_POST['shopItemQuantity'];
+	$orderedItemQuantity = $_POST['orderedQuantity'];
 	//(int) in this check is explicitly converting it to an integer before checking if it 'is_int'
 	if (!is_int((int)$shopItemId) || !is_int((int)$receivedOrderId) || !is_int((int)$orderedItemQuantity)) {
 		echo json_encode(["message" => "error: invalid json data"]);
 		http_response_code(400);
 		return;
 	}
-	$result = $mysqli->prepare("INSERT INTO orderedItems (shopItemId, receivedOrderId, shopItemQuantity) VALUES (?, ?, ?)");
+	$result = $mysqli->prepare("INSERT INTO orderedItems (shopItemId, receivedOrderId, orderedQuantity) VALUES (?, ?, ?)");
 	$result->bind_param('iii', $shopItemId, $receivedOrderId, $orderedItemQuantity);
 
 	if ($result->execute()) {

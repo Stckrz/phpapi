@@ -75,6 +75,7 @@ function handlePostShopItem($mysqli)
 	$shopItemName = $_POST['shopItemName'];
 	$price = $_POST['price'];
 	$buyPrice = $_POST['buyPrice'];
+	$shopItemCategory = $_POST['shopItemCategory'];
 	$quantity = $_POST['quantity'];
 	$parAmount = $_POST['parAmount'];
 
@@ -83,8 +84,8 @@ function handlePostShopItem($mysqli)
 		http_response_code(400);
 		return;
 	}
-	$result = $mysqli->prepare("INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?)");
-	$result->bind_param("sddii", $shopItemName, $price, $buyPrice, $quantity, $parAmount);
+	$result = $mysqli->prepare("INSERT INTO shopItems (shopItemName, price, buyPrice, quantity, parAmount) VALUES (?, ?, ?, ?, ?, ?)");
+	$result->bind_param("ssddii", $shopItemName, $shopItemCategory, $price, $buyPrice, $quantity, $parAmount);
 
 	if ($result->execute()) {
 		echo "New record created for " . $shopItemName;
@@ -106,6 +107,10 @@ function handlePutShopItem($mysqli)
 		if (isset($data['shopItemName'])) {
 			$shopItemName = $mysqli->real_escape_string($data['shopItemName']);
 			$fields[] = "shopItemName = '$shopItemName'";
+		}
+		if (isset($data['shopItemCategory'])) {
+			$shopItemCategory = $mysqli->real_escape_string($data['shopItemCategory']);
+			$fields[] = "shopItemCategory = '$shopItemCategory'";
 		}
 		if (isset($data['price'])) {
 			$price = intval($data['price']);
