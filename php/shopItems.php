@@ -41,7 +41,10 @@ function handleGetShopItems($mysqli)
 	} elseif (isset($_GET['shopItemName'])) {
 		$shopItemName = $mysqli->real_escape_string($_GET['shopItemName']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemName = '$shopItemName'");
-	} elseif (isset($_GET['page'])) {
+	}elseif (isset($_GET['category'])){
+		$category = $mysqli->real_escape_string($_GET['category']);
+		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemCategory = '$category'");
+	}elseif (isset($_GET['page'])) {
 		$page = (int)$_GET['page'];
 		$offset = ($page - 1) * 10;
 		$result = $mysqli->query("SELECT * FROM shopItems LIMIT 10 OFFSET $offset");
