@@ -8,7 +8,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $mysqli = new mysqli($host, $user, $password, $database);
 if ($mysqli->connect_error) {
-	die("connection failed: " . $mysqly->connect_error);
+	die("connection failed: " . $mysqli->connect_error);
 }
 
 switch ($method) {
@@ -33,7 +33,7 @@ function handleGetReceivedOrders($mysqli)
 		$page = (int)$_GET['page'];
 		$offset = ($page - 1) * 10;
 		$result = $mysqli->query("SELECT * FROM receivedOrder LIMIT 10 OFFSET $offset");
-	} else if (isset($_GET['unfulfilled'])){
+	} else if (isset($_GET['unfulfilled'])) {
 		$result = $mysqli->query("SELECT * FROM receivedOrder WHERE fulfilledDate IS NULL");
 	}
 	if ($result) {
@@ -72,6 +72,7 @@ function handlePostReceivedOrder($mysqli)
 
 function handlePutReceivedOrder($mysqli)
 {
+	$queries = [];
 	parse_str($_SERVER['QUERY_STRING'], $queries);
 	$receivedOrderId = $queries['receivedOrderId'];
 	if (isset($receivedOrderId)) {
@@ -80,7 +81,7 @@ function handlePutReceivedOrder($mysqli)
 		$fields = [];
 
 		if (isset($data['totalOrderAmount'])) {
-			$totalOrderAmount = floatVal($data['totalOrderAmount']);
+			$totalOrderAmount = floatval($data['totalOrderAmount']);
 			$fields[] = "totalOrderAmount = '$totalOrderAmount'";
 		}
 		if (isset($data['orderDate'])) {

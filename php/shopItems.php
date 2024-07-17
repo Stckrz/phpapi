@@ -100,6 +100,7 @@ function handlePostShopItem($mysqli)
 
 function handlePutShopItem($mysqli)
 {
+	$queries = [];
 	parse_str($_SERVER['QUERY_STRING'], $queries);
 	$shopItemId = $queries['shopItemId'];
 	if (isset($shopItemId)) {
@@ -132,7 +133,7 @@ function handlePutShopItem($mysqli)
 			$fields[] = "parAmount = $parAmount";
 		}
 
-		if (count($fields) === 5) {
+		if (count($fields) === 6) {
 			$query = "UPDATE shopItems SET " . implode(', ', $fields) . " WHERE shopItemId = $shopItemId";
 			echo $query;
 			if ($mysqli->query($query)) {
@@ -142,7 +143,6 @@ function handlePutShopItem($mysqli)
 			}
 		} else {
 			echo json_encode(["message" => "error updating: improper json format"]);
-			http_response_code(500);
 		}
 	}
 }
