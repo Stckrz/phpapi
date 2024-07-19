@@ -38,13 +38,18 @@ function handleGetShopItems($mysqli)
 	if (isset($_GET['shopItemId'])) {
 		$shopItemId = $mysqli->real_escape_string($_GET['shopItemId']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemId = '$shopItemId'");
+	} elseif (isset($_GET['categoryList'])) {
+		$result = $mysqli->query("SELECT DISTINCT shopItemCategory from shopItems");
 	} elseif (isset($_GET['shopItemName'])) {
 		$shopItemName = $mysqli->real_escape_string($_GET['shopItemName']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemName = '$shopItemName'");
-	}elseif (isset($_GET['category'])){
+	} elseif (isset($_GET['category'])) {
 		$category = $mysqli->real_escape_string($_GET['category']);
 		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemCategory = '$category'");
-	}elseif (isset($_GET['page'])) {
+	} elseif (isset($_GET['itemNameString'])) {
+		$itemNameString = $mysqli->real_escape_string($_GET['itemNameString']);
+		$result = $mysqli->query("SELECT * FROM shopItems WHERE shopItemName LIKE '$itemNameString%'");
+	} elseif (isset($_GET['page'])) {
 		$page = (int)$_GET['page'];
 		$offset = ($page - 1) * 10;
 		$result = $mysqli->query("SELECT * FROM shopItems LIMIT 10 OFFSET $offset");
@@ -108,27 +113,27 @@ function handlePutShopItem($mysqli)
 		$data = json_decode($requestBody, true);
 		$fields = [];
 
-		if (isset($data['shopItemName'])) {
+		if (isset($data['shopItemName']) && is_string($data['shopItemName'])) {
 			$shopItemName = $mysqli->real_escape_string($data['shopItemName']);
 			$fields[] = "shopItemName = '$shopItemName'";
 		}
-		if (isset($data['shopItemCategory'])) {
+		if (isset($data['shopItemCategory']) && is_string($data['shopItemCategory'])) {
 			$shopItemCategory = $mysqli->real_escape_string($data['shopItemCategory']);
 			$fields[] = "shopItemCategory = '$shopItemCategory'";
 		}
-		if (isset($data['price'])) {
-			$price = intval($data['price']);
+		if (isset($data['price']) && is_numeric($data['price'])) {
+			$price = floatval($data['price']);
 			$fields[] = "price = $price";
 		}
-		if (isset($data['buyPrice'])) {
+		if (isset($data['buyPrice']) && is_numeric($data['buyPrice'])) {
 			$buyPrice = floatval($data['buyPrice']);
 			$fields[] = "buyPrice = $buyPrice";
 		}
-		if (isset($data['quantity'])) {
+		if (isset($data['quantity']) && is_numeric($data['quantity'])) {
 			$quantity = intval($data['quantity']);
 			$fields[] = "quantity = $quantity";
 		}
-		if (isset($data['parAmount'])) {
+		if (isset($data['parAmount']) && is_numeric($data['parAmount'])) {
 			$parAmount = intval($data['parAmount']);
 			$fields[] = "parAmount = $parAmount";
 		}
@@ -137,11 +142,12 @@ function handlePutShopItem($mysqli)
 			$query = "UPDATE shopItems SET " . implode(', ', $fields) . " WHERE shopItemId = $shopItemId";
 			echo $query;
 			if ($mysqli->query($query)) {
-				echo json_encode(["message" => "item updated successfully"]);
+				echo json_encode(["message" => "item updated successfully" . json_encode($data)]);
 			} else {
 				echo json_encode(["message" => "error updating: " . $mysqli->error]);
 			}
 		} else {
+			http_response_code(400);
 			echo json_encode(["message" => "error updating: improper json format"]);
 		}
 	}
