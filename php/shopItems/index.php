@@ -75,7 +75,7 @@ function handleGetShopItems($mysqli)
 		$response = ["message" => "Failed to fetch shopItems"];
 		http_response_code(500);
 	}
-	echo json_encode($response);
+	echo json_encode($response, JSON_NUMERIC_CHECK);
 }
 
 function handlePostShopItem($mysqli)
